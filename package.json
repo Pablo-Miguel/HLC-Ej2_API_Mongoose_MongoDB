@@ -1,0 +1,25 @@
+{
+  "name": "hlc-ej2_api_mongoose_mongodb",
+  "version": "1.0.0",
+  "description": "Little API using Mongoose driver",
+  "main": "./src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pablo-Miguel/HLC-Ej2_API_Mongoose_MongoDB.git"
+  },
+  "author": "Pablo-Miguel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pablo-Miguel/HLC-Ej2_API_Mongoose_MongoDB/issues"
+  },
+  "homepage": "https://github.com/Pablo-Miguel/HLC-Ej2_API_Mongoose_MongoDB#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.9.0",
+    "phone": "^3.1.33",
+    "validator": "^13.7.0"
+  }
+}
