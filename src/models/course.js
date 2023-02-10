@@ -1,23 +1,43 @@
 const mongoose = require('mongoose');
 
-const Course = mongoose.model('Course', {
+const courseSchema = new mongoose.Schema('Course', {
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
-    avg_note: {
+    description: {
         type: Number,
-        default: 0,
-        validate(value) {
-            if (value < 0 || value > 10) {
-                throw new Error('Avg note must be between 0 and 10')
-            }
-        }
+        default: "This course doesn't have description",
+        trim: true
     },
-    user: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User"
+    cre8_date: {
+        type: Date,
+        default: new Date()
+    },
+    price: {
+        type: Number,
+        default: 0.00
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 });
+
+courseSchema.method.toJSON = () => {
+    const course = this;
+    const courseObject = course.toObject();
+    const cad_author = `${course.author.firstName} ${course.author.lastName}`;
+
+    delete courseObject.author;
+
+    courseObject.author = cad_author;
+
+    return courseObject;
+};
+
+const Course = mongoose.model('Course', courseSchema);
 
 module.exports = Course;
