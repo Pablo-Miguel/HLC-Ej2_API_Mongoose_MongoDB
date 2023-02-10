@@ -1,29 +1,32 @@
 const express = require('express');
 const Course = require('../models/course');
+const auth = require('../middleware/auth');
 const router = new express.Router();
 
-router.post('/createcourse', async (req, res) => {
-    const course = new Course(req.body);
+router.post('/courses/createcourse', auth, async (req, res) => {
+    const course = new Course({
+        ...req.body,
+        author: req.user._id
+    });
 
     try {
         await course.save();
-        res.status(201).send(course);
+
+        res.send(course);
     } catch (e) {
         res.status(400).send(e);
     }
 });
 
-router.get('/searchcourse/:id', async (req, res) => {
-    const _id = req.params.id;
-
+router.get('/courses/allcourses', auth, async (req, res) => {
     try {
-        const course = await Course.findById(_id);
+        const courses = await Course.find({});
         
-        if (!course) {
-            return res.status(404).send({ error: 'No course found!' });
+        if (!courses) {
+            return res.status(404).send()
         }
 
-        res.status(200).send(course);
+        res.send(courses);
     } catch (e) {
         res.status(500).send(e);
     }

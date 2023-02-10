@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
-const userSchema = new mongoose.Schema('User', {
+const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema('User', {
     }]
 });
 
-userSchema.method.toJSON = () => {
+userSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
 
@@ -55,7 +55,7 @@ userSchema.method.toJSON = () => {
     return userObject;
 };
 
-userSchema.generateAuthToken = async () => {
+userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign({ _id: user._id.toString() }, 'thisIsMyTokenPassword');
 
@@ -65,7 +65,7 @@ userSchema.generateAuthToken = async () => {
     return token;
 };
 
-userSchema.static.findByCredentials = async (email, password) => {
+userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -81,17 +81,17 @@ userSchema.static.findByCredentials = async (email, password) => {
     return user;
 };
 
-userSchema.pre('save', async (next) => {
+userSchema.pre('save', async function (next) {
     const user = this;
 
-    if(user.isModified('password')){
+    if(user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8);
     }
 
     next();
 });
 
-userSchema.pre('remove', async (next) => {
+userSchema.pre('remove', async function (next) {
     const user = this;
     
     next();

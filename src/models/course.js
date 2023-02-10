@@ -1,13 +1,15 @@
+const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
+const User = require('./user');
 
-const courseSchema = new mongoose.Schema('Course', {
+const courseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         trim: true
     },
     description: {
-        type: Number,
+        type: String,
         default: "This course doesn't have description",
         trim: true
     },
@@ -25,18 +27,6 @@ const courseSchema = new mongoose.Schema('Course', {
         ref: 'User'
     }
 });
-
-courseSchema.method.toJSON = () => {
-    const course = this;
-    const courseObject = course.toObject();
-    const cad_author = `${course.author.firstName} ${course.author.lastName}`;
-
-    delete courseObject.author;
-
-    courseObject.author = cad_author;
-
-    return courseObject;
-};
 
 const Course = mongoose.model('Course', courseSchema);
 

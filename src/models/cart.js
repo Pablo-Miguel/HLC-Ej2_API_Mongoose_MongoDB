@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Cart = mongoose.Model('Cart', {
+const Cart = mongoose.model('Cart', {
     paid: {
         type: Number,
         default: 0.00
@@ -20,3 +20,5 @@ const Cart = mongoose.Model('Cart', {
         ref: 'Course'
     }
 });
+
+module.exports = Cart;
