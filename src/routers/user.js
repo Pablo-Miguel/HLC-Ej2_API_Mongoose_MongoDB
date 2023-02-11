@@ -60,7 +60,7 @@ router.patch('/users/updateme', auth, async (req, res) => {
 
         await req.user.save();
 
-        res.send(user);
+        res.send(req.user);
     } catch (e) {
         res.status(400).send(e);
     }

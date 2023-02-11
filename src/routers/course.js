@@ -1,6 +1,9 @@
 const express = require('express');
 const Course = require('../models/course');
 const auth = require('../middleware/auth');
+const User = require('../models/user');
+const Cart = require('../models/cart');
+const { castObject } = require('../models/cart');
 const router = new express.Router();
 
 router.post('/courses/createcourse', auth, async (req, res) => {
@@ -20,13 +23,53 @@ router.post('/courses/createcourse', auth, async (req, res) => {
 
 router.get('/courses/allcourses', auth, async (req, res) => {
     try {
-        const courses = await Course.find({});
+        const carts = await Cart.find({user: req.user._id});
+        let courses = await Course.find({author: {$ne: req.user._id}});
+
+        let carts_courses_ids = [];
+        carts.forEach((element) => {
+            carts_courses_ids.push(element.course.toString());
+        });
         
-        if (!courses) {
-            return res.status(404).send()
+        let temp_courses = [];
+        for(let i = 0; i < courses.length; i++){
+            if(!carts_courses_ids.includes(courses[i]._id.toString())){
+                const user = await User.findById(courses[i].author);
+                const courseObject = courses[i].toObject();
+                delete courseObject.author;
+                courseObject.author = `${user.firstName} ${user.lastName}`;
+
+                temp_courses.push(courseObject);
+            }
         }
 
-        res.send(courses);
+        if(temp_courses.length == 0) return res.status(404).send({ status: 'No courses for sale yet!' });
+
+        res.send(temp_courses);
+    } catch (e) {
+        res.status(500).send(e);
+    }
+});
+
+router.get('/courses/mycoursescart', auth, async (req, res) => {
+    try {
+
+        const carts = await Cart.find({ user: req.user._id });
+
+        let temp_courses = [];
+        for(let i = 0; i < carts.length; i++){
+            const course = await Course.findById(carts[i].course);
+            const user = await User.findById(course.author);
+            const courseObject = course.toObject();
+            delete courseObject.author;
+            courseObject.author = `${user.firstName} ${user.lastName}`;
+
+            temp_courses.push(courseObject);
+        }
+
+        if(temp_courses.length == 0) return res.status(404).send({ status: 'You has not buy any course yet!' });
+
+        res.send(temp_courses);
     } catch (e) {
         res.status(500).send(e);
     }
@@ -42,26 +85,33 @@ router.patch('/updatecourse/:id', async (req, res) => {
     }
 
     try {
-        const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const course = await Course.findById(req.params.id);
 
-        if (!course) {
-            return res.status(404).send({ error: 'No course found!' });
-        }
+        if(!course) res.status(404).send({ cod: 0, status: 'Course not found!' });
+
+        else if(course.author !== req.user._id) res.status(401).send({ cod: 1, status: 'You are not the owner of the course!' });
+
+        updates.forEach(update => {
+            course[update] = req.body[update];
+        });
+
+        await course.save();
 
         res.send(course);
     } catch (e) {
-        res.status(400).send(e);
+        res.status(500).send(e);
     }
 });
 
 router.delete('/deletecourse/:id', async (req, res) => {
     try {
-        const course = await Course.findByIdAndDelete(req.params.id);
+        const course = await Course.findById(req.params.id);
 
-        if (!course) {
-            return res.status(404).send({ error: 'No course found!' });
-        }
+        if(!course) return res.status(404).send({ status: 'Course not found!' })
 
+        else if(course.author !== req.user._id) return res.status(401).send({ status: 'You are not the owner of the course!' })
+        
+        course.delete();
         res.send(course);
     } catch (e) {
         res.status(500).send(e);

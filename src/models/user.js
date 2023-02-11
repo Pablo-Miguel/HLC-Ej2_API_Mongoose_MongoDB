@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const Course = require('./course');
+const Cart = require('./cart');
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -93,7 +95,8 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre('remove', async function (next) {
     const user = this;
-    
+    await Course.deleteMany({ author: user._id });
+    await Cart.deleteMany({ user: user._id });
     next();
 });
 

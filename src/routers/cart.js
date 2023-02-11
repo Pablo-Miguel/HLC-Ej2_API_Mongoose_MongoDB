@@ -22,7 +22,7 @@ router.post('/cart/addtocart/:id_course', auth, async (req, res) => {
         });
         
         await cart.save();
-
+        
         res.send(cart);
     } catch (e) {
         res.status(500).send(e);
@@ -34,20 +34,27 @@ router.get('/cart/mycart', auth, async (req, res) => {
 
         const carts = await Cart.find({ user: req.user._id });
 
-        let new_carts = [];
+        let temp_carts = [];
         for(let i = 0; i < carts.length; i++){
-            const user = await User.findById(req.user._id);
             const course = await Course.findById(carts[i].course);
+            const cartObject = carts[i].toObject();
+            delete cartObject.user;
+            delete cartObject.course;
+            cartObject.user = req.user;
 
-            new_carts.push({
-                ...carts[i],
-                user: user,
-                course: course
-            });
+            const user = await User.findById(course.author);
+            const courseObject = course.toObject();
+            delete courseObject.author;
+            courseObject.author = `${user.firstName} ${user.lastName}`;
 
+            cartObject.course = courseObject;
+
+            temp_carts.push(cartObject);
         }
 
-        res.send(new_carts);
+        if(temp_carts.length == 0) res.status(404).send({ status: 'Your cart is empty!' });
+
+        res.send(temp_carts);
     } catch (e) {
         res.status(500).send(e);
     }
