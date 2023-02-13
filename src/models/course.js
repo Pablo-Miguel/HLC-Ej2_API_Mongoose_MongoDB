@@ -1,4 +1,3 @@
-const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 const User = require('./user');
 
@@ -27,6 +26,15 @@ const courseSchema = new mongoose.Schema({
         ref: 'User'
     }
 });
+
+// courseSchema.methods.toJSONAsync = async function () {
+//     const course = this;
+//     const user = await User.findById(course.author);
+//     const courseObject = course.toObject();
+//     delete courseObject.author;
+//     courseObject.author = `${user.firstName} ${user.lastName}`;
+//     return courseObject;
+// };
 
 const Course = mongoose.model('Course', courseSchema);
 

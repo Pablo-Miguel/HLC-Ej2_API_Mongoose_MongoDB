@@ -1,4 +1,3 @@
-const { ObjectId } = require('bson');
 const express = require('express');
 const Cart = require('../models/cart');
 const Course = require('../models/course');
@@ -41,11 +40,8 @@ router.get('/cart/mycart', auth, async (req, res) => {
             delete cartObject.user;
             delete cartObject.course;
             cartObject.user = req.user;
-
-            const user = await User.findById(course.author);
-            const courseObject = course.toObject();
-            delete courseObject.author;
-            courseObject.author = `${user.firstName} ${user.lastName}`;
+            
+            const courseObject = await toObjectCourse(course);
 
             cartObject.course = courseObject;
 
@@ -59,5 +55,14 @@ router.get('/cart/mycart', auth, async (req, res) => {
         res.status(500).send(e);
     }
 });
+
+async function toObjectCourse(course){
+    const user = await User.findById(course.author);
+    const courseObject = course.toObject();
+    delete courseObject.author;
+    courseObject.author = `${user.firstName} ${user.lastName}`;
+
+    return courseObject;
+}
 
 module.exports = router;

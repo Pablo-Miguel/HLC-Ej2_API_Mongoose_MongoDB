@@ -4,7 +4,8 @@
   "description": "Little API using Mongoose driver",
   "main": "./src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/app.js",
+    "dev": "env-cmd ./config/dev.env nodemon ./src/app.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,9 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.0",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.20"
   }
 }

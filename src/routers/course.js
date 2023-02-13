@@ -3,7 +3,6 @@ const Course = require('../models/course');
 const auth = require('../middleware/auth');
 const User = require('../models/user');
 const Cart = require('../models/cart');
-const { castObject } = require('../models/cart');
 const router = new express.Router();
 
 router.post('/courses/createcourse', auth, async (req, res) => {
@@ -34,10 +33,7 @@ router.get('/courses/allcourses', auth, async (req, res) => {
         let temp_courses = [];
         for(let i = 0; i < courses.length; i++){
             if(!carts_courses_ids.includes(courses[i]._id.toString())){
-                const user = await User.findById(courses[i].author);
-                const courseObject = courses[i].toObject();
-                delete courseObject.author;
-                courseObject.author = `${user.firstName} ${user.lastName}`;
+                const courseObject = await toObjectCourse(courses[i]);
 
                 temp_courses.push(courseObject);
             }
@@ -59,10 +55,7 @@ router.get('/courses/mycoursescart', auth, async (req, res) => {
         let temp_courses = [];
         for(let i = 0; i < carts.length; i++){
             const course = await Course.findById(carts[i].course);
-            const user = await User.findById(course.author);
-            const courseObject = course.toObject();
-            delete courseObject.author;
-            courseObject.author = `${user.firstName} ${user.lastName}`;
+            const courseObject = await toObjectCourse(course);
 
             temp_courses.push(courseObject);
         }
@@ -117,5 +110,14 @@ router.delete('/deletecourse/:id', async (req, res) => {
         res.status(500).send(e);
     }
 });
+
+async function toObjectCourse(course){
+    const user = await User.findById(course.author);
+    const courseObject = course.toObject();
+    delete courseObject.author;
+    courseObject.author = `${user.firstName} ${user.lastName}`;
+
+    return courseObject;
+}
 
 module.exports = router;
