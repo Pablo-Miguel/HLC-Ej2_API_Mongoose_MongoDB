@@ -39,7 +39,7 @@ router.get('/courses/allcourses', auth, async (req, res) => {
             }
         }
 
-        if(temp_courses.length == 0) return res.status(404).send({ status: 'No courses for sale yet!' });
+        if(temp_courses.length == 0) return res.status(404).send({ error: 'No courses for sale yet!' });
 
         res.send(temp_courses);
     } catch (e) {
@@ -60,7 +60,7 @@ router.get('/courses/mycoursescart', auth, async (req, res) => {
             temp_courses.push(courseObject);
         }
 
-        if(temp_courses.length == 0) return res.status(404).send({ status: 'You has not buy any course yet!' });
+        if(temp_courses.length == 0) return res.status(404).send({ error: 'You has not buy any course yet!' });
 
         res.send(temp_courses);
     } catch (e) {
@@ -80,9 +80,9 @@ router.patch('/updatecourse/:id', async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
-        if(!course) res.status(404).send({ cod: 0, status: 'Course not found!' });
+        if(!course) res.status(404).send({ error: 'Course not found!' });
 
-        else if(course.author !== req.user._id) res.status(401).send({ cod: 1, status: 'You are not the owner of the course!' });
+        else if(course.author !== req.user._id) res.status(401).send({ error: 'You are not the owner of the course!' });
 
         updates.forEach(update => {
             course[update] = req.body[update];
@@ -100,9 +100,9 @@ router.delete('/deletecourse/:id', async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
-        if(!course) return res.status(404).send({ status: 'Course not found!' })
+        if(!course) return res.status(404).send({ error: 'Course not found!' })
 
-        else if(course.author !== req.user._id) return res.status(401).send({ status: 'You are not the owner of the course!' })
+        else if(course.author !== req.user._id) return res.status(401).send({ error: 'You are not the owner of the course!' })
         
         course.delete();
         res.send(course);
