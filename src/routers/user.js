@@ -40,7 +40,7 @@ router.get('/users/logout', auth, async (req, res) => {
     }
 });
 
-router.get('/users/howami', auth, async (req, res) => {
+router.get('/users/whoami', auth, async (req, res) => {
     res.send(req.user);
 });
 
