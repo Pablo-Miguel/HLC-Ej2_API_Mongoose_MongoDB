@@ -29,9 +29,10 @@ router.post('/users/login', async (req, res) => {
 
 router.get('/users/logout', auth, async (req, res) => {
     try{
-        req.user.tokens = req.tokens.filter(token => {
+        req.user.tokens = req.user.tokens.filter(token => {
             return token.token !== req.token;
         });
+        
         await req.user.save();
 
         res.send({ status: 'You have just logged out of the page' });
