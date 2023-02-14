@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Pablo-Miguel/HLC-Ej2_API_Mongoose_MongoDB#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.0",
