@@ -19,10 +19,17 @@ router.post('/cart/addtocart/:id_course', auth, async (req, res) => {
             user: req.user._id,
             course: course._id
         });
-        
+
         await cart.save();
         
-        res.send(cart);
+        const courseObject = await toObjectCourse(course);
+        const cart_req = {
+            ...cart.toObject(),
+            user: req.user,
+            course: courseObject
+        };
+        
+        res.send(cart_req);
     } catch (e) {
         res.status(500).send(e);
     }
@@ -55,6 +62,15 @@ router.get('/cart/mycart', auth, async (req, res) => {
         res.status(500).send(e);
     }
 });
+
+async function toObjectCourse(course){
+    const user = await User.findById(course.author);
+    const courseObject = course.toObject();
+    delete courseObject.author;
+    courseObject.author = `${user.firstName} ${user.lastName}`;
+
+    return courseObject;
+}
 
 async function toObjectCourse(course){
     const user = await User.findById(course.author);

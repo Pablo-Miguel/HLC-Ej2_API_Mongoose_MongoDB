@@ -58,7 +58,12 @@ router.get('/courses/mycoursescart', auth, async (req, res) => {
         for(let i = 0; i < carts.length; i++){
             const course = await Course.findById(carts[i].course);
             const courseObject = await toObjectCourse(course);
+            
+            const paid = carts[i].paid;
 
+            delete courseObject.price;
+            courseObject.price = paid;
+            
             temp_courses.push(courseObject);
         }
 
