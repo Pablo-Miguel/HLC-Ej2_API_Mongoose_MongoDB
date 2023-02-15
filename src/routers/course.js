@@ -14,7 +14,9 @@ router.post('/courses/createcourse', auth, async (req, res) => {
     try {
         await course.save();
 
-        res.send(course);
+        const courseObject = await toObjectCourse(course);
+
+        res.send(courseObject);
     } catch (e) {
         res.status(400).send(e);
     }
@@ -61,6 +63,26 @@ router.get('/courses/mycoursescart', auth, async (req, res) => {
         }
 
         if(temp_courses.length == 0) return res.status(404).send({ error: 'You has not buy any course yet!' });
+
+        res.send(temp_courses);
+    } catch (e) {
+        res.status(500).send(e);
+    }
+});
+
+router.get('/courses/mycoursesworkspace', auth, async (req, res) => {
+    try {
+
+        const courses = await Course.find({ author: req.user._id });
+
+        let temp_courses = [];
+        for(let i = 0; i < courses.length; i++){
+            const courseObject = await toObjectCourse(courses[i]);
+
+            temp_courses.push(courseObject);
+        }
+
+        if(temp_courses.length == 0) return res.status(404).send({ error: 'You has not create any course yet!' });
 
         res.send(temp_courses);
     } catch (e) {
