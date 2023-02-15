@@ -95,21 +95,25 @@ router.get('/courses/mycoursesworkspace', auth, async (req, res) => {
     }
 });
 
-router.patch('/updatecourse/:id', async (req, res) => {
+router.put('/courses/updatecourse/:id', async (req, res) => {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'avg_note', 'user'];
+    const allowedUpdates = ['name', 'description', 'price'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
     if (!isValidOperation) {
         return res.status(400).send({ error: 'Invalid updates!' });
     }
 
+
     try {
+        
         const course = await Course.findById(req.params.id);
-
-        if(!course) res.status(404).send({ error: 'Course not found!' });
-
-        else if(course.author !== req.user._id) res.status(401).send({ error: 'You are not the owner of the course!' });
+        
+        // console.log("LLEGA COMPROBACION");
+        // if(course == null) res.status(404).send({ error: 'Course not found!' });
+        // else if(course.author.toString() !== req.user._id.toString()) res.status(401).send({ error: 'You are not the owner of the course!' });
+        
+        // console.log(course);
 
         updates.forEach(update => {
             course[update] = req.body[update];
@@ -117,22 +121,27 @@ router.patch('/updatecourse/:id', async (req, res) => {
 
         await course.save();
 
-        res.send(course);
+        const courseObject = await toObjectCourse(course);
+
+        res.send(courseObject);
     } catch (e) {
         res.status(500).send(e);
     }
 });
 
-router.delete('/deletecourse/:id', async (req, res) => {
+router.delete('/courses/deletecourse/:id', async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
-        if(!course) return res.status(404).send({ error: 'Course not found!' })
+        // if(!course) return res.status(404).send({ error: 'Course not found!' })
 
-        else if(course.author !== req.user._id) return res.status(401).send({ error: 'You are not the owner of the course!' })
+        // else if(course.author !== req.user._id) return res.status(401).send({ error: 'You are not the owner of the course!' })
         
         course.delete();
-        res.send(course);
+
+        const courseObject = await toObjectCourse(course);
+
+        res.send(courseObject);
     } catch (e) {
         res.status(500).send(e);
     }

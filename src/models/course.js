@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./user');
+const Cart = require('./cart');
 
 const courseSchema = new mongoose.Schema({
     name: {
@@ -35,6 +35,12 @@ const courseSchema = new mongoose.Schema({
 //     courseObject.author = `${user.firstName} ${user.lastName}`;
 //     return courseObject;
 // };
+
+courseSchema.pre('remove', async function (next) {
+    const course = this;
+    await Cart.deleteMany({ course: course._id });
+    next();
+});
 
 const Course = mongoose.model('Course', courseSchema);
 

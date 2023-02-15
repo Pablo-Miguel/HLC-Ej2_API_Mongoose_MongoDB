@@ -72,13 +72,4 @@ async function toObjectCourse(course){
     return courseObject;
 }
 
-async function toObjectCourse(course){
-    const user = await User.findById(course.author);
-    const courseObject = course.toObject();
-    delete courseObject.author;
-    courseObject.author = `${user.firstName} ${user.lastName}`;
-
-    return courseObject;
-}
-
 module.exports = router;
