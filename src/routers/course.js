@@ -79,7 +79,7 @@ router.get('/courses/mycoursesworkspace', auth, async (req, res) => {
     try {
 
         const courses = await Course.find({ author: req.user._id });
-
+        
         let temp_courses = [];
         for(let i = 0; i < courses.length; i++){
             const courseObject = await toObjectCourse(courses[i]);

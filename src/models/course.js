@@ -27,14 +27,16 @@ const courseSchema = new mongoose.Schema({
     }
 });
 
-// courseSchema.methods.toJSONAsync = async function () {
-//     const course = this;
-//     const user = await User.findById(course.author);
-//     const courseObject = course.toObject();
-//     delete courseObject.author;
-//     courseObject.author = `${user.firstName} ${user.lastName}`;
-//     return courseObject;
-// };
+courseSchema.methods.toJSON = function () {
+    const course = this;
+    const courseObject = course.toObject();
+    const author = courseObject.author;
+
+    delete courseObject.author;
+    courseObject.author = `${author.firstName} ${author.lastName}`;
+
+    return courseObject;
+};
 
 courseSchema.pre('remove', async function (next) {
     const course = this;
